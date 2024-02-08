@@ -1,153 +1,122 @@
 from enum import Enum
 import random
 
-class Type(Enum):
-    Normal = 0
-    Fire = 1
-    Water = 2
-    Electric = 3
-    Grass = 4
-    Ice = 5
-    Fighting = 6
-    Poison = 7
-    Ground = 8
-    Flying = 9
-    Psychic = 10
-    Bug = 11
-    Rock = 12
-    Ghost = 13
-    Dragon = 14
-    Dark = 15
-    Steel = 16
-    Fairy = 17
+class Style(Enum):
+    ノーマル = 0
+    ほのお = 1
+    みず = 2
+    でんき = 3
+    くさ = 4
+    こおり = 5
+    かくとう = 6
+    どく = 7
+    じめん = 8
+    ひこう = 9
+    エスパー = 10
+    むし = 11
+    いわ = 12
+    ゴースト = 13
+    ドラゴン = 14
+    あく = 15
+    はがね = 16
+    フェアリー = 17
 
 class Pokemon():
-    def __init__(self, type1, type2=None):
-        self.type1 = type1
-        if type2 == None:
-            self.type2 = type1
+    def __init__(self, style1, style2=None):
+        if style2 == None:
+            self.style1 = self.style2 = style1
         else:
-            self.type2 = type2
-        self.is_dead = False
+            self.style1 = min(style1, style2)
+            self.style2 = max(style1, style2)
+
+    @property
+    def is_single(self):
+        return self.style1 == self.style2
 
     def __repr__(self):
-        if self.type1 == self.type2:
-            return f"Type: {Type(self.type1).name}"
-        elif self.type1 < self.type2:
-            return f"Type1: {Type(self.type1).name}, Type2: {Type(self.type2).name}"
-        elif self.type1 > self.type2:
-            return f"Type1: {Type(self.type2).name}, Type2: {Type(self.type1).name}"
+        if self.is_single:
+            return f"タイプ: {Style(self.style1).name}"
+        else:
+            return f"タイプ1: {Style(self.style1).name}, タイプ2: {Style(self.style2).name}"
         
     def __str__(self):
-        if self.type1 == self.type2:
-            return f"Type: {Type(self.type1).name}"
-        elif self.type1 < self.type2:
-            return f"Type1: {Type(self.type1).name}, Type2: {Type(self.type2).name}"
-        elif self.type1 > self.type2:
-            return f"Type1: {Type(self.type2).name}, Type2: {Type(self.type1).name}"
+        if self.is_single:
+            return f"タイプ: {Style(self.style1).name}"
+        else:
+            return f"タイプ1: {Style(self.style1).name}, タイプ2: {Style(self.style2).name}"
         
     def __hash__(self):
-        if self.type1 == self.type2:
-            return hash(f"Type: {Type(self.type1).name}")
-        elif self.type1 < self.type2:
-            return hash(f"Type1: {Type(self.type1).name}, Type2: {Type(self.type2).name}")
-        elif self.type1 > self.type2:
-            return hash(f"Type1: {Type(self.type2).name}, Type2: {Type(self.type1).name}")
+        if self.style1 == self.style2:
+            return hash(f"Style: {Style(self.style1).name}")
+        else:
+            return hash(f"Style1: {Style(self.style1).name}, Style2: {Style(self.style2).name}")
         
     def __eq__(self, other):
-        if self.type1 < self.type2 and other.type1 < other.type2:
-            return (self.type1 == other.type1 and self.type2 == other.type2)
-        elif self.type1 >= self.type2 and other.type1 < other.type2:
-            return (self.type2 == other.type1 and self.type1 == other.type2)
-        elif self.type1 < self.type2 and other.type1 >= other.type2:
-            return (self.type1 == other.type2 and self.type2 == other.type1)
-        elif self.type1 >= self.type2 and other.type1 >= other.type2:
-            return (self.type2 == other.type2 and self.type1 == other.type1)
+        if self.style1 < self.style2 and other.style1 < other.style2:
+            return (self.style1 == other.style1 and self.style2 == other.style2)
+        elif self.style1 >= self.style2 and other.style1 < other.style2:
+            return (self.style2 == other.style1 and self.style1 == other.style2)
+        elif self.style1 < self.style2 and other.style1 >= other.style2:
+            return (self.style1 == other.style2 and self.style2 == other.style1)
+        elif self.style1 >= self.style2 and other.style1 >= other.style2:
+            return (self.style2 == other.style2 and self.style1 == other.style1)
 
 compatibility = [
     #N  F  W  E  G  I  F  P  G  F  P  B  R  G  D  D  S  F
-    [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 2, 2, 1, 2], # Normal →
-    [2, 1, 1, 2, 3, 3, 2, 2, 2, 2, 2, 3, 1, 2, 1, 2, 3, 2], # Fire →
-    [2, 3, 1, 2, 1, 2, 2, 2, 3, 2, 2, 2, 3, 2, 1, 2, 2, 2], # Water →
-    [2, 2, 3, 1, 1, 2, 2, 2, 0, 3, 2, 2, 2, 2, 1, 2, 2, 2], # Electric →
-    [2, 1, 3, 2, 1, 2, 2, 1, 3, 1, 2, 1, 3, 2, 1, 2, 1, 2], # Grass →
-    [2, 1, 1, 2, 3, 1, 2, 2, 3, 3, 2, 2, 2, 2, 3, 2, 1, 2], # Ice →
-    [3, 2, 2, 2, 2, 3, 2, 1, 2, 1, 1, 1, 3, 0, 2, 3, 3, 1], # Fighting →
-    [2, 2, 2, 2, 3, 2, 2, 1, 1, 2, 2, 2, 1, 1, 2, 2, 0, 3], # Poison →
-    [2, 3, 2, 3, 1, 2, 2, 3, 2, 0, 2, 1, 3, 2, 2, 2, 3, 2], # Ground →
-    [2, 2, 2, 1, 3, 2, 3, 2, 2, 2, 2, 3, 1, 2, 2, 2, 1, 2], # Flying →
-    [2, 2, 2, 2, 2, 2, 3, 3, 2, 2, 1, 2, 2, 2, 2, 0, 1, 2], # Psychic →
-    [2, 1, 2, 2, 3, 2, 1, 1, 2, 1, 3, 2, 2, 1, 2, 3, 1, 1], # Bug →
-    [2, 3, 2, 2, 2, 3, 1, 2, 1, 3, 2, 3, 2, 2, 2, 2, 1, 2], # Rock →
-    [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 3, 2, 1, 2, 2], # Ghost →
-    [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 1, 0], # Dragon →
-    [2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 3, 2, 2, 3, 2, 1, 2, 1], # Dark →
-    [2, 1, 1, 1, 2, 3, 1, 2, 2, 2, 2, 2, 3, 2, 2, 2, 1, 3], # Steel →
-    [2, 1, 2, 2, 2, 2, 3, 1, 2, 2, 2, 2, 2, 2, 3, 3, 1, 2], # Fairy →
+    [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 2, 2, 1, 2], # Normal->
+    [2, 1, 1, 2, 3, 3, 2, 2, 2, 2, 2, 3, 1, 2, 1, 2, 3, 2], # Fire->
+    [2, 3, 1, 2, 1, 2, 2, 2, 3, 2, 2, 2, 3, 2, 1, 2, 2, 2], # Water->
+    [2, 2, 3, 1, 1, 2, 2, 2, 0, 3, 2, 2, 2, 2, 1, 2, 2, 2], # Electric->
+    [2, 1, 3, 2, 1, 2, 2, 1, 3, 1, 2, 1, 3, 2, 1, 2, 1, 2], # Grass->
+    [2, 1, 1, 2, 3, 1, 2, 2, 3, 3, 2, 2, 2, 2, 3, 2, 1, 2], # Ice->
+    [3, 2, 2, 2, 2, 3, 2, 1, 2, 1, 1, 1, 3, 0, 2, 3, 3, 1], # Fighting->
+    [2, 2, 2, 2, 3, 2, 2, 1, 1, 2, 2, 2, 1, 1, 2, 2, 0, 3], # Poison->
+    [2, 3, 2, 3, 1, 2, 2, 3, 2, 0, 2, 1, 3, 2, 2, 2, 3, 2], # Ground->
+    [2, 2, 2, 1, 3, 2, 3, 2, 2, 2, 2, 3, 1, 2, 2, 2, 1, 2], # Flying->
+    [2, 2, 2, 2, 2, 2, 3, 3, 2, 2, 1, 2, 2, 2, 2, 0, 1, 2], # Psychic->
+    [2, 1, 2, 2, 3, 2, 1, 1, 2, 1, 3, 2, 2, 1, 2, 3, 1, 1], # Bug->
+    [2, 3, 2, 2, 2, 3, 1, 2, 1, 3, 2, 3, 2, 2, 2, 2, 1, 2], # Rock->
+    [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 3, 2, 1, 2, 2], # Ghost->
+    [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 1, 0], # Dragon->
+    [2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 3, 2, 2, 3, 2, 1, 2, 1], # Dark->
+    [2, 1, 1, 1, 2, 3, 1, 2, 2, 2, 2, 2, 3, 2, 2, 2, 1, 3], # Steel->
+    [2, 1, 2, 2, 2, 2, 3, 1, 2, 2, 2, 2, 2, 2, 3, 3, 1, 2], # Fairy->
 ]
 
 def Battle(attacker, defender):
-    point = 0
+    def calculate(move):
+        if move[0] == 0:
+            return 0
+        elif len(move) == 1:
+            return sum(move) + 10
+        elif len(move) == 2:
+            return sum(move) - 10
 
-    attacker_score1 = 0
-    attacker_score2 = 0
-    move1 = []
-    move1.append(compatibility[attacker.type1][defender.type1])
-    if defender.type1 != defender.type2:
-        move1.append(compatibility[attacker.type1][defender.type2])
-    move1.sort()
-    
-    if move1[0] == 0:
-        attacker_score1 = 0
-    elif len(move1) == 1:
-        attacker_score1 = sum(move1) + 1
-    elif len(move1) == 2:
-        attacker_score1 = sum(move1) - 1
+    def get_attacker_score(attacker, defender):
+        # タイプ1の技で攻撃
+        move = []
+        move.append(compatibility[attacker.style1][defender.style1] * 10)
+        if not defender.is_single:
+            move.append(compatibility[attacker.style1][defender.style2] * 10)
+        move.sort()
+        attacker_score = calculate(move)
 
-    move1 = []
-    move1.append(compatibility[attacker.type2][defender.type1])
-    if defender.type1 != defender.type2:
-        move1.append(compatibility[attacker.type2][defender.type2])
-    move1.sort()
-    if move1[0] == 0:
-        attacker_score2 = 0
-    elif len(move1) == 1:
-        attacker_score2 = sum(move1) + 1
-    elif len(move1) == 2:
-        attacker_score2 = sum(move1) - 1
+        if not attacker.is_single:
+            # タイプ2の技で攻撃
+            move = []
+            move.append(compatibility[attacker.style1][defender.style1] * 10)
+            if not defender.is_single:
+                move.append(compatibility[attacker.style1][defender.style2] * 10)
+            move.sort()
+            # より相性がいい技を採用
+            return max(attacker_score, calculate(move))
+        else:
+            return attacker_score
 
-    point += max(attacker_score1, attacker_score2)
+    attacker_score = get_attacker_score(attacker, defender)
+    defender_score = 50 - get_attacker_score(defender, attacker)
 
-    defender_score1 = 0
-    defender_score2 = 0
-    move2 = []
-    move2.append(compatibility[defender.type1][attacker.type1])
-    if attacker.type1 != attacker.type2:
-        move2.append(compatibility[defender.type1][attacker.type2])
-    move2.sort()
-
-    if move2[0] == 0:
-        defender_score1 = 0
-    elif len(move2) == 1:
-        defender_score1 = sum(move2) + 1
-    elif len(move2) == 2:
-        defender_score1 = sum(move2) - 1
-
-    move2 = []
-    move2.append(compatibility[defender.type2][attacker.type1])
-    if attacker.type1 != attacker.type2:
-        move2.append(compatibility[defender.type2][attacker.type2])
-    move2.sort()
-    if move2[0] == 0:
-        defender_score2 = 0
-    elif len(move2) == 1:
-        defender_score2 = sum(move2) + 1
-    elif len(move2) == 2:
-        defender_score2 = sum(move2) - 1
-
-    point += min(5 - defender_score1, 5 - defender_score2)
-
-    return point * 10
+    return (attacker_score + defender_score)
 
 
 
@@ -155,29 +124,48 @@ def Battle(attacker, defender):
 def Crossover(pokemon1, pokemon2):
     random_number1 = random.randint(0, 1)
     random_number2 = random.randint(0, 1)
-    type1 = -1
-    type2 = -1
+    style1 = -1
+    style2 = -1
     if random_number1 == 0:
-        type1 = pokemon1.type1
+        style1 = pokemon1.style1
     elif random_number1 == 1:
-        type1 = pokemon1.type2
+        style1 = pokemon1.style2
 
     if random_number2 == 0:
-        type2 = pokemon2.type1
+        style2 = pokemon2.style1
     elif random_number2 == 1:
-        type2 = pokemon2.type2
+        style2 = pokemon2.style2
 
-    return Pokemon(type1, type2)
+    return Pokemon(style1, style2)
 
-max_iteration = 100
+def style_complex_display(gen, stylestyle):
+    grass_dict = dict()
+    for i in range(num_style):
+        grass_dict[i] = 0
+    for pokemon in gen:
+        if pokemon.style1 == stylestyle:
+            grass_dict[pokemon.style2] += 1
+        elif pokemon.style2 == stylestyle:
+            grass_dict[pokemon.style1] += 1
+    
+    sorted_style_items = sorted(grass_dict.items(), key=lambda item: item[1])
+
+    for key, value in sorted_style_items:
+        print(f"Style: {Style(key).name}, Count: {value}")
+
+
+
+
+
+max_iteration = 1
 population = 1000
-num_type = 18
+num_style = 18
 
 if __name__ == "__main__":
-    random.seed(2)
+    random.seed(0)
     # init
     gen = []
-    for i in range(num_type):
+    for i in range(num_style):
         for j in range(population):
             gen.append(Pokemon(i))
 
@@ -188,16 +176,21 @@ if __name__ == "__main__":
         next_gen = []
 
         # 全てのポケモンを適当に戦わせる
-        for pokemon in gen:
-            random_number1 = random.randint(0, 17)
-            random_number2 = random.randint(0, 17)
-            tmp_pokemon = Pokemon(random_number1, random_number2)
-            prob = Battle(pokemon, tmp_pokemon)
-            # print(f"{pokemon}, {tmp_pokemon}, point: {prob}")
+        for i in range(num_style*population//2):
+            while True:
+                random_number1 = 0
+                random_number2 = random.randint(0, len(gen) - 1)
+                if random_number1 != random_number2:
+                    break
+            pokemon2 = gen.pop(random_number2)
+            pokemon1 = gen.pop(random_number1)
+            prob = Battle(pokemon1, pokemon2)
+            print(f"{pokemon1}, {pokemon2}, point: {prob}")
             if prob > random.randint(0, 99):
-                living_gen.append(pokemon)
+                living_gen.append(pokemon1)
             else:
-                pokemon.is_dead = True
+                living_gen.append(pokemon2)
+
 
         # 交叉
         for pokemon in living_gen:
@@ -211,7 +204,7 @@ if __name__ == "__main__":
 
         # 余った枠はランダムに交叉させる
         num_next_gen = len(next_gen)
-        for i in range(num_type*population - num_next_gen):
+        for i in range(num_style*population - num_next_gen):
             while True:
                 random_number1 = random.randint(0, len(living_gen) - 1)
                 random_number2 = random.randint(0, len(living_gen) - 1)
@@ -223,6 +216,25 @@ if __name__ == "__main__":
             next_gen.append(new_pokemon)
 
         gen = next_gen[:]
+        style_dict = dict()
+        for i in range(num_style):
+            style_dict[i] = 0
+        for pokemon in gen:
+            if pokemon.is_single:
+                style_dict[pokemon.style1] += 1
+            else:
+                style_dict[pokemon.style1] += 1
+                style_dict[pokemon.style2] += 1
+        
+        sorted_style_items = sorted(style_dict.items(), key=lambda item: item[1])
+
+        for key, value in sorted_style_items:
+            print(f"Style: {Style(key).name}, Count: {value}")
+        # style_complex_display(gen, Style.Bug.value)
+                
+                
+
+
 
     dict = dict()
     for pokemon in gen:
