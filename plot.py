@@ -6,24 +6,24 @@ population_size = 1000
 num_of_styles = 18
 
 class Style(Enum):
-    Normal = 0 # ノーマル
-    Fire = 1 # ほのお
-    Water = 2 # みず
-    Electric = 3 # でんき
-    Grass = 4 # くさ
-    Ice = 5 # こおり
-    Fighting = 6 # かくとう
-    Poison = 7 # どく
-    Ground = 8 # じめん
-    Flying = 9 # ひこう
-    Psychic = 10 # エスパー
-    Bug = 11 # むし
-    Rock = 12 # いわ
-    Ghost = 13 # ゴースト
-    Dragon = 14 # ドラゴン
-    Dark = 15 # あく
-    Steel = 16 # はがね
-    Fairy = 17 # フェアリー
+    ノーマル = 0 # Normal
+    ほのお = 1 # Fire
+    みず = 2 # Water
+    でんき = 3 # Electric
+    くさ = 4 # Grass
+    こおり = 5 # Ice
+    かくとう = 6 # Fighting
+    どく = 7 # Poison
+    じめん = 8 # Ground
+    ひこう = 9 # Flying
+    エスパー = 10 # Psychic
+    むし = 11 # Bug
+    いわ = 12 # Rock
+    ゴースト = 13 # Ghost
+    ドラゴン = 14 # Dragon
+    あく = 15 # Drak
+    はがね = 16 # Steel
+    フェアリー = 17 # Fairy
 
 style_colors = [
     "#aea886", # Normal
@@ -46,6 +46,14 @@ style_colors = [
     "#ffbbff" # Fairy
 ]
 
+import matplotlib.pyplot as plt
+plt.rcParams["font.family"] = "MS Gothic"
+plt.figure(figsize=(10, 6))
+
+
+plt.title("第1000世代のタイプ別個体数")
+# plt.xlabel("世代数")
+# plt.ylabel("タイプ別個体数")
 # タイプ
 styles = [[] for i in range(num_of_styles)]
 
@@ -65,6 +73,28 @@ for generation in range(num_of_generations + 1):
     for i in range(num_of_styles):
         styles[i].append(styles2[i])
     print(generation)
+    if generation == num_of_generations:
+        # 各要素とそのインデックスをタプルにする
+        indexed_arr = list(enumerate(styles2))
+
+        # タプルの2番目の要素（配列の値）に基づいてソートする
+        sorted_indexed_arr = sorted(indexed_arr, key=lambda x: x[1])
+
+        # ソートされた配列と元のインデックスを表示
+        for index, value in sorted_indexed_arr:
+            print(f"Value: {value}, Original Index: {index}")
+        
+        sorted_values = [value for index, value in sorted_indexed_arr]
+        categorys = [Style(index).name for index, value in sorted_indexed_arr]
+        sorted_colors = [style_colors[index] for index, value in sorted_indexed_arr]
+        bars = plt.barh(categorys, sorted_values, color=sorted_colors)
+        # bars = plt.bar(categories, values, color=colors)
+
+        # 各棒に値を表示
+        for bar in bars:
+            xval = bar.get_width()
+            plt.text(xval + 20, bar.get_y() + bar.get_height()/2, round(xval, 2), ha='left', va='center')
+
 
 dominant_style_ids = [2, 1, 3, 4, 5]
 labels = [Style(dominant_style_ids[i]).name for i in range(len(dominant_style_ids))]
@@ -76,9 +106,7 @@ def tyuusyutu(styles, style_ids):
         ret.append(styles[style_ids[i]])
     return ret
 print(styles)
-    
 
-import matplotlib.pyplot as plt
 
 plt.figure(figsize=(10, 6))
 
@@ -96,8 +124,8 @@ for i in range(18):
 
 # グラフのタイトルと軸ラベルの設定
 plt.title("")
-plt.xlabel("Generation")
-plt.ylabel("Count By Type")
+plt.xlabel("世代数")
+plt.ylabel("タイプ別個体数")
 
 # 凡例の表示
 plt.legend(loc='upper left')
