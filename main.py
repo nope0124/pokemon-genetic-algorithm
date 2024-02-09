@@ -1,27 +1,5 @@
-from enum import Enum
-import random
-import json
-import os
-
-class Style(Enum):
-    ノーマル = 0 # Normal
-    ほのお = 1 # Fire
-    みず = 2 # Water
-    でんき = 3 # Electric
-    くさ = 4 # Grass
-    こおり = 5 # Ice
-    かくとう = 6 # Fighting
-    どく = 7 # Poison
-    じめん = 8 # Ground
-    ひこう = 9 # Flying
-    エスパー = 10 # Psychic
-    むし = 11 # Bug
-    いわ = 12 # Rock
-    ゴースト = 13 # Ghost
-    ドラゴン = 14 # Dragon
-    あく = 15 # Dark
-    はがね = 16 # Steel
-    フェアリー = 17 # Fairy
+from style import Style
+import os, json, random
 
 compatibility_table = [
     #N  F  W  E  G  I  F  P  G  F  P  B  R  G  D  D  S  F
@@ -41,7 +19,7 @@ compatibility_table = [
     [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 3, 2, 1, 2, 2], # Ghost->
     [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 1, 0], # Dragon->
     [2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 3, 2, 2, 3, 2, 1, 2, 1], # Dark->
-    [2, 1, 1, 1, 2, 3, 1, 2, 2, 2, 2, 2, 3, 2, 2, 2, 1, 3], # Steel->
+    [2, 1, 1, 1, 2, 3, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 1, 3], # Steel->
     [2, 1, 2, 2, 2, 2, 3, 1, 2, 2, 2, 2, 2, 2, 3, 3, 1, 2], # Fairy->
 ]
 
@@ -126,25 +104,6 @@ class Pokemon(object):
 
         return Pokemon(style1, style2)
 
-def style_complex_display(current_pokemons, stylestyle):
-    grass_dict = dict()
-    for i in range(num_of_styles):
-        grass_dict[i] = 0
-    for pokemon in current_pokemons:
-        if pokemon.style1 == stylestyle:
-            grass_dict[pokemon.style2] += 1
-        elif pokemon.style2 == stylestyle:
-            grass_dict[pokemon.style1] += 1
-    
-    sorted_style_items = sorted(grass_dict.items(), key=lambda item: item[1])
-
-    for key, value in sorted_style_items:
-        print(f"Style: {Style(key).name}, Count: {value}")
-
-
-
-
-
 num_of_generations = 1000 # 世代数
 population_size = 1000 # 個体数
 num_of_styles = 18 # タイプ数
@@ -177,8 +136,6 @@ if __name__ == "__main__":
             pokemon1 = current_pokemons.pop(random.randint(1, len(current_pokemons) - 1))
             pokemon2 = current_pokemons.pop(0)
             prob = pokemon1.evaluate_battle(pokemon2)
-            if generation == 2:
-                print(f"{pokemon1}, {pokemon2}, point: {prob}")
             if prob > random.randint(0, 99):
                 surviving_pokemons.append(pokemon1)
             else:
@@ -223,6 +180,7 @@ if __name__ == "__main__":
         for style, value in top5_styles:
             print(f"タイプ: {Style(style).name}, {value}匹")
 
+    # 最終世代にいるポケモンのタイプ
     styles_dict = dict()
     for pokemon in current_pokemons:
         if pokemon not in styles_dict:
@@ -236,6 +194,7 @@ if __name__ == "__main__":
         else:
             print(f"タイプ1: {Style(pokemon.style1).name}, タイプ2: {Style(pokemon.style2).name}, {value}匹")
 
+    # 最終世代の各タイプ
     dominant_styles_dict = dict()
     for i in range(num_of_styles):
         dominant_styles_dict[i] = 0
