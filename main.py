@@ -177,7 +177,7 @@ if __name__ == "__main__":
             pokemon1 = current_pokemons.pop(random.randint(1, len(current_pokemons) - 1))
             pokemon2 = current_pokemons.pop(0)
             prob = pokemon1.evaluate_battle(pokemon2)
-            if _ == 1:
+            if generation == 2:
                 print(f"{pokemon1}, {pokemon2}, point: {prob}")
             if prob > random.randint(0, 99):
                 surviving_pokemons.append(pokemon1)
@@ -228,10 +228,26 @@ if __name__ == "__main__":
         if pokemon not in styles_dict:
             styles_dict[pokemon] = 0
         styles_dict[pokemon] += 1
-    sorted_styles = sorted(dict.items(), key=lambda item: item[1], reverse=True)
+    sorted_styles = sorted(styles_dict.items(), key=lambda item: item[1], reverse=True)
 
     for pokemon, value in sorted_styles:
         if pokemon.is_single:
-            print(f"タイプ: {Style(pokemon.style1).name}, {value}匹")
+            print(f"タイプ1: {Style(pokemon.style1).name}, {value}匹")
         else:
             print(f"タイプ1: {Style(pokemon.style1).name}, タイプ2: {Style(pokemon.style2).name}, {value}匹")
+
+    dominant_styles_dict = dict()
+    for i in range(num_of_styles):
+        dominant_styles_dict[i] = 0
+    for pokemon in current_pokemons:
+        if pokemon.is_single:
+            dominant_styles_dict[pokemon.style1] += 1
+        else:
+            dominant_styles_dict[pokemon.style1] += 1
+            dominant_styles_dict[pokemon.style2] += 1
+    
+    sorted_styles = sorted(dominant_styles_dict.items(), key=lambda item: item[1], reverse=True)
+
+    for style, value in sorted_styles:
+        print(f"タイプ: {Style(style).name}, {value}匹")
+
