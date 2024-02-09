@@ -51,7 +51,7 @@ plt.rcParams["font.family"] = "MS Gothic"
 plt.figure(figsize=(10, 6))
 
 
-plt.title("第1000世代のタイプ別個体数")
+plt.title("第1000世代の複合タイプ含めたタイプ別個体数")
 # plt.xlabel("世代数")
 # plt.ylabel("タイプ別個体数")
 # タイプ
@@ -73,7 +73,7 @@ for generation in range(num_of_generations + 1):
     for i in range(num_of_styles):
         styles[i].append(styles2[i])
     print(generation)
-    if generation == num_of_generations:
+    if False:
         # 各要素とそのインデックスをタプルにする
         indexed_arr = list(enumerate(styles2))
 
@@ -94,6 +94,27 @@ for generation in range(num_of_generations + 1):
         for bar in bars:
             xval = bar.get_width()
             plt.text(xval + 20, bar.get_y() + bar.get_height()/2, round(xval, 2), ha='left', va='center')
+    if generation == num_of_generations:
+        complex_dict = dict()
+        for i in range(num_of_styles*population_size):
+            style1 = data["population"][i]["style1"]
+            style2 = data["population"][i]["style2"]
+            if (style1, style2) not in complex_dict:
+                complex_dict[(style1, style2)] = 0
+            complex_dict[(style1, style2)] += 1
+        sorted_style_items = sorted(complex_dict.items(), key=lambda item: item[1])
+        sorted_style_items_10 = sorted_style_items[-15:]
+        categorys = [f"{Style(index[0]).name}・{Style(index[1]).name}" for index, value in sorted_style_items_10]
+        sorted_values = [value for index, value in sorted_style_items_10]
+        for index, value in sorted_style_items_10:
+            category = f"{Style(index[0]).name}・{Style(index[1]).name}"
+            if index[0] == index[1]:
+                category = f"{Style(index[0]).name}"
+            plt.barh(category, value / 2, color=style_colors[index[0]])
+            bars = plt.barh(category, value / 2, left=value / 2, color=style_colors[index[1]])
+            for bar in bars:
+                xval = bar.get_width()*2
+                plt.text(xval + 5, bar.get_y() + bar.get_height()/2, round(value, 2), ha='left', va='center')
 
 
 dominant_style_ids = [2, 1, 3, 4, 5]
