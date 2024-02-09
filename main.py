@@ -45,7 +45,7 @@ compatibility_table = [
     [2, 1, 2, 2, 2, 2, 3, 1, 2, 2, 2, 2, 2, 2, 3, 3, 1, 2], # Fairy->
 ]
 
-class Pokemon(Object):
+class Pokemon(object):
     def __init__(self, style1, style2=None):
         if style2 == None:
             self.style1 = self.style2 = style1
@@ -169,11 +169,11 @@ if __name__ == "__main__":
 
     # 2. 数世代回す
     for generation in range(1, num_of_generations + 1):
-        print("Generation: ", generation)
+        print(f"第{generation}世代")
 
         # 2.1. 全てのポケモンを戦わせる
         surviving_pokemons = []
-        for i in range(num_of_styles*population//2):
+        for i in range(num_of_styles*population_size//2):
             pokemon1 = current_pokemons.pop(random.randint(1, len(current_pokemons) - 1))
             pokemon2 = current_pokemons.pop(0)
             prob = pokemon1.evaluate_battle(pokemon2)
@@ -188,8 +188,8 @@ if __name__ == "__main__":
         next_pokemons = []
         for pokemon in surviving_pokemons:
             while True:
-                random_number1 = random.randint(0, num_of_styles*population//2 - 1)
-                random_number2 = random.randint(0, num_of_styles*population//2 - 1)
+                random_number1 = random.randint(0, num_of_styles*population_size//2 - 1)
+                random_number2 = random.randint(0, num_of_styles*population_size//2 - 1)
                 if pokemon != surviving_pokemons[random_number1] and pokemon != surviving_pokemons[random_number2] and random_number1 != random_number2:
                     break
             other_pokemon1 = surviving_pokemons[random_number1]
@@ -217,7 +217,7 @@ if __name__ == "__main__":
                 dominant_styles_dict[pokemon.style1] += 1
                 dominant_styles_dict[pokemon.style2] += 1
         
-        sorted_styles = reverse(sorted(dominant_styles_dict.items(), key=lambda item: item[1]))
+        sorted_styles = sorted(dominant_styles_dict.items(), key=lambda item: item[1], reverse=True)
         top5_styles = sorted_styles[:5]
 
         for style, value in top5_styles:
@@ -228,7 +228,7 @@ if __name__ == "__main__":
         if pokemon not in styles_dict:
             styles_dict[pokemon] = 0
         styles_dict[pokemon] += 1
-    sorted_styles = reverse(sorted(dict.items(), key=lambda item: item[1]))
+    sorted_styles = sorted(dict.items(), key=lambda item: item[1], reverse=True)
 
     for pokemon, value in sorted_styles:
         if pokemon.is_single:
